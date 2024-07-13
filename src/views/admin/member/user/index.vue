@@ -41,33 +41,32 @@
                         </el-button>
                     </el-col>
                     <el-col :span="1.5">
-                        <el-button v-hasPermi="['permission:user:{id}:delete']" type="danger" plain icon="el-icon-delete"
-                            size="mini" :disabled="multiple" @click="handleDelete">删除
+                        <el-button v-hasPermi="['permission:user:{id}:delete']" type="danger" plain
+                            icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除
                         </el-button>
                     </el-col>
-                    <right-toolbar :show-search.sync="showSearch" :columns="columns" @queryTable="getList" />
+                    <right-toolbar :show-search.sync="showSearch" @queryTable="getList" />
                 </el-row>
 
                 <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="50" align="center" />
-                    <el-table-column v-if="columns[0].visible" key="id" label="用户编号" align="center" prop="id" />
-                    <el-table-column v-if="columns[1].visible" key="username" label="用户名称" align="center" prop="username"
+                    <el-table-column key="id" label="用户编号" align="center" prop="id" />
+                    <el-table-column key="username" label="用户名" align="center" prop="username"
                         :show-overflow-tooltip="true" />
-                    <el-table-column v-if="columns[2].visible" key="name" label="用户昵称" align="center" prop="name"
+                    <el-table-column key="userUrl" label="用户链接" align="center" prop="username"
                         :show-overflow-tooltip="true" />
-                    <el-table-column v-if="columns[3].visible" key="inviteCode" label="邀请码" align="center" prop="inviteCode"
+                    <el-table-column key="name" label="用户昵称" align="center" prop="name" :show-overflow-tooltip="true" />
+                    <el-table-column key="inviteCode" label="邀请码" align="center" prop="inviteCode"
                         :show-overflow-tooltip="true" />
-                    <el-table-column v-if="columns[4].visible" key="parent" label="上级" align="center" prop="parent"
+                    <el-table-column key="parent" label="上级" align="center" prop="parent"
                         :show-overflow-tooltip="true" />
-                    <el-table-column v-if="columns[5].visible" key="mobile" label="手机号码" align="center" prop="mobile"
-                        width="120" />
-                    <el-table-column v-if="columns[6].visible" key="is_active" label="状态" align="center">
+                    <el-table-column key="mobile" label="手机号码" align="center" prop="mobile" width="120" />
+                    <el-table-column key="is_active" label="状态" align="center">
                         <template slot-scope="scope">
                             <el-switch v-model="scope.row.is_active" disabled @change="handleStatusChange(scope.row)" />
                         </template>
                     </el-table-column>
-                    <el-table-column v-if="columns[7].visible" label="创建时间" align="center" prop="create_datetime"
-                        width="160">
+                    <el-table-column label="创建时间" align="center" prop="create_datetime" width="160">
                         <template slot-scope="scope">
                             <span>{{ parseTime(scope.row.create_datetime) }}</span>
                         </template>
@@ -76,10 +75,10 @@
                         v-if="hasPermi(['permission:user:{id}:put', 'permission:user:{id}:delete', 'permission:user:resetpwd:put'])"
                         label="操作" align="center" width="160" class-name="small-padding fixed-width">
                         <template slot-scope="scope">
-                            <el-button v-hasPermi="['permission:user:{id}:put']" size="mini" type="text" icon="el-icon-edit"
-                                @click="handleUpdate(scope.row)">修改
+                            <el-button v-hasPermi="['permission:user:{id}:put']" size="mini" type="text"
+                                icon="el-icon-edit" @click="handleUpdate(scope.row)">修改
                             </el-button>
-                            
+
                         </template>
                     </el-table-column>
                 </el-table>
@@ -149,7 +148,7 @@
         </el-dialog>
     </div>
 </template>
-  
+
 <script>
 import {
     addUser,
@@ -227,16 +226,16 @@ export default {
                 is_active: undefined,
             },
             // 列信息
-            columns: [
-                { key: 0, label: `序号`, visible: false },
-                { key: 1, label: `用户名称`, visible: true },
-                { key: 2, label: `用户昵称`, visible: true },
-                { key: 3, label: `邀请码`, visible: true },
-                { key: 4, label: `上级`, visible: true },
-                { key: 5, label: `手机号码`, visible: true },
-                { key: 6, label: `状态`, visible: true },
-                { key: 7, label: `创建时间`, visible: true }
-            ],
+            // columns: [
+            //     { key: 0, label: `序号`, visible: false },
+            //     { key: 1, label: `用户名称`, visible: true },
+            //     { key: 2, label: `用户昵称`, visible: true },
+            //     { key: 3, label: `邀请码`, visible: true },
+            //     { key: 4, label: `上级`, visible: true },
+            //     { key: 5, label: `手机号码`, visible: true },
+            //     { key: 6, label: `状态`, visible: true },
+            //     { key: 7, label: `创建时间`, visible: true }
+            // ],
             // 表单校验
             rules: {
                 username: [
@@ -266,7 +265,7 @@ export default {
         };
     },
     watch: {
-       
+
     },
     created() {
         this.getList();
@@ -291,13 +290,13 @@ export default {
             }
             );
         },
-       
+
         // 筛选节点
         filterNode(value, data) {
             if (!value) return true;
             return data.label.indexOf(value) !== -1;
         },
-        
+
         // 用户状态修改
         handleStatusChange(row) {
             const text = row.is_active === true ? "启用" : "停用";
@@ -471,4 +470,3 @@ export default {
     width: 100% !important;
 }
 </style>
-  
