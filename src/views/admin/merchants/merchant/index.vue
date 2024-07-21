@@ -4,12 +4,12 @@
             <!--用户数据-->
             <el-col :span="20" :xs="24">
                 <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-                    <el-form-item label="token" prop="token">
-                        <el-input v-model="queryParams.token" placeholder="请输入token" clearable size="small"
+                    <el-form-item label="商家名称" prop="name">
+                        <el-input v-model="queryParams.name" placeholder="请输入商家名称" clearable size="small"
                             style="width: 240px" @keyup.enter.native="handleQuery" />
                     </el-form-item>
-                    <el-form-item label="状态" prop="status">
-                        <el-select v-model="queryParams.status" placeholder="token状态" clearable size="small"
+                    <el-form-item label="状态" prop="sttatus">
+                        <el-select v-model="queryParams.status" placeholder="商家状态" clearable size="small"
                             style="width: 240px">
                             <el-option v-for="dict in statusOptions" :key="dict.dictValue" :label="dict.dictLabel"
                                 :value="dict.dictValue" />
@@ -31,25 +31,14 @@
                             size="mini" @click="handleAdd">新增
                         </el-button>
                     </el-col>
-                    <el-col :span="1.5">
-                        <el-button v-hasPermi="['permission:user:{id}:put']" type="success" plain icon="el-icon-edit"
-                            size="mini" :disabled="single" @click="handleUpdate">修改
-                        </el-button>
-                    </el-col>
-                    <el-col :span="1.5">
-                        <el-button v-hasPermi="['permission:user:{id}:delete']" type="danger" plain
-                            icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除
-                        </el-button>
-                    </el-col>
+
                     <right-toolbar :show-search.sync="showSearch" @queryTable="getList" />
                 </el-row>
 
-                <el-table v-loading="loading" :data="tokenList" @selection-change="handleSelectionChange">
+                <el-table v-loading="loading" :data="merchantsList" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="50" align="center" />
-                    <el-table-column key="token" label="token" align="center" prop="token"
-                        :show-overflow-tooltip="true" />
-                    <el-table-column key="area" label="区域" align="center" prop="area"
-                        :show-overflow-tooltip="true" />
+                    <el-table-column key="name" label="商户名称" align="center" prop="name" :show-overflow-tooltip="true" />
+                    <el-table-column key="telegarm" label="商户TG" align="center" prop="telegarm" :show-overflow-tooltip="true" />
                     <el-table-column key="status" label="状态" align="center">
                         <template slot-scope="scope">
                             <span v-if="scope.row.status == 1">启用</span>
@@ -66,14 +55,10 @@
                             <span>{{ parseTime(scope.row.create_datetime) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        v-if="hasPermi(['permission:user:{id}:put', 'permission:user:{id}:delete', 'permission:user:resetpwd:put'])"
-                        label="操作" align="center" width="160" class-name="small-padding fixed-width">
+                    <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
                         <template slot-scope="scope">
-                            <el-button v-hasPermi="['permission:user:{id}:put']" size="mini" type="text"
-                                icon="el-icon-edit" @click="handleUpdate(scope.row)">修改
+                            <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改
                             </el-button>
-
                         </template>
                     </el-table-column>
                 </el-table>
@@ -87,16 +72,16 @@
         <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
                 <el-row>
-                    <el-col :span="24">
-                        <el-form-item label="token" prop="token">
-                            <el-input v-model="form.token" placeholder="请输入token" />
+                    <el-col :span="12">
+                        <el-form-item label="商户名称" prop="name">
+                            <el-input v-model="form.name" placeholder="请输入商户名称" />
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row>
-                    <el-col :span="24">
-                        <el-form-item label="area" prop="area">
-                            <el-input v-model="form.area" placeholder="请输入区域" />
+                    <el-col :span="12">
+                        <el-form-item label="商户TG" prop="telegarm">
+                            <el-input v-model="form.telegarm" placeholder="请输入商户TG" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -129,14 +114,14 @@
 
 <script>
 import {
-    listToken,
-    addToken,
-    getToken,
-    updateToken
-} from "@/api/admin/bot/token";
+    listMerchants,
+    addMerchants,
+    getMerchants,
+    updateMerchants,
+} from "@/api/admin/merchants/merchant";
 
 export default {
-    name: "Token",
+    name: "Merchants",
     data() {
         return {
             // 遮罩层
@@ -152,7 +137,9 @@ export default {
             // 总条数
             total: 0,
             // 用户表格数据
-            tokenList: null,
+            merchantsList: null,
+            // 菜单数据
+            menuList: null,
             // 弹出层标题
             title: "",
             // 是否显示弹出层
@@ -179,15 +166,15 @@ export default {
             queryParams: {
                 pageNum: 1,
                 pageSize: 10,
-                username: undefined,
-                mobile: undefined,
-                is_active: undefined,
+                name: undefined,
+                status: undefined,
             },
             // 表单校验
             rules: {
-                token: [
-                    { required: true, message: "token不能为空", trigger: "blur" }
+                menuName: [
+                    { required: true, message: "菜单名称不能为空", trigger: "blur" }
                 ],
+
             }
         };
     },
@@ -201,8 +188,8 @@ export default {
         /** 查询用户列表 */
         getList() {
             this.loading = true;
-            listToken(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-                this.tokenList = response.data.results;
+            listMerchants(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
+                this.merchantsList = response.data.results;
                 this.total = response.data.count;
                 this.loading = false;
             }
@@ -218,9 +205,11 @@ export default {
         reset() {
             this.form = {
                 id: undefined,
-                token: undefined,
+                name: undefined,
                 status: 1,
                 description: undefined,
+                isRecommend: 0,
+                isHot: 0
             };
             this.resetForm("form");
         },
@@ -245,17 +234,17 @@ export default {
         handleAdd() {
             this.reset();
             this.open = true;
-            this.title = "添加用户";
+            this.title = "添加商家";
         },
         /** 修改按钮操作 */
         handleUpdate(row) {
             this.reset();
             const id = row.id || this.ids;
-            getToken(id).then(response => {
+            getMerchants(id).then(response => {
                 const data = response.data;
                 this.form = data;
                 this.open = true;
-                this.title = "修改token";
+                this.title = "修改菜单";
             });
         },
         /** 提交按钮 */
@@ -263,13 +252,13 @@ export default {
             this.$refs["form"].validate(valid => {
                 if (valid) {
                     if (this.form.id !== undefined) {
-                        updateToken(this.form).then(response => {
+                        updateMerchants(this.form).then(response => {
                             this.msgSuccess("修改成功");
                             this.open = false;
                             this.getList();
                         });
                     } else {
-                        addToken(this.form).then(response => {
+                        addMerchants(this.form).then(response => {
                             this.msgSuccess("新增成功");
                             this.open = false;
                             this.getList();
