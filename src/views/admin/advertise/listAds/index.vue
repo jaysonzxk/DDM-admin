@@ -46,7 +46,7 @@
                     <el-table-column key="isExpire" label="是否过期" align="center" prop="isExpire"
                         :show-overflow-tooltip="true">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.isExpire == 0" style="color: green;">未到期</span>
+                            <span v-if="scope.row.isExpire === 0" style="color: green;">未到期</span>
                             <span v-else style="color: red;">已到期</span>
                         </template>
                     </el-table-column>
@@ -65,13 +65,13 @@
                     <el-table-column key="isRecommend" label="是否推荐" align="center" prop="isRecommend"
                         :show-overflow-tooltip="true">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.isRecommend == 0">不推荐</span>
+                            <span v-if="scope.row.isRecommend === 0">不推荐</span>
                             <span v-else>推荐</span>
                         </template>
                     </el-table-column>
                     <el-table-column key="isHot" label="是否热门" align="center" prop="isHot" :show-overflow-tooltip="true">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.isHot == 0">不热门</span>
+                            <span v-if="scope.row.isHot === 0">不热门</span>
                             <span v-else>热门</span>
                         </template>
                     </el-table-column>
@@ -80,7 +80,7 @@
                         :show-overflow-tooltip="true" />
                     <el-table-column key="status" label="状态" align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.status == 1">启用</span>
+                            <span v-if="scope.row.status === 1">启用</span>
                             <span v-else>禁用</span>
                         </template>
                     </el-table-column>
@@ -158,11 +158,18 @@
                     <el-col :span="20">
                         <el-form-item label="关联商家" prop="merchant" >
                             <el-select v-model="form.merchant" filterable remote placeholder="请输入关键词"
-                                :remote-method="searchQuery" :loading="searchLoading" disabled="false">
-                                <el-option v-for="item in merchantsList" :key="item.id" :label="item.id"
-                                    :value="item.name">
+                                :remote-method="searchQuery" :loading="searchLoading" v-if="this.title==='开通广告'">
+                                <el-option v-for="item in merchantsList" :key="item.id" :label="item.value"
+                                    :value="item.id">
                                 </el-option>
                             </el-select>
+
+                          <el-select v-model="form.merchant" filterable remote placeholder="请输入关键词"
+                                     :remote-method="searchQuery" :loading="searchLoading" v-else :disabled="disabled">
+                            <el-option v-for="item in merchantsList" :key="item.id" :label="item.value"
+                                       :value="item.id">
+                            </el-option>
+                          </el-select>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -266,7 +273,8 @@ export default {
     data() {
         return {
             renewalOpen: false,
-            // 遮罩层
+            disabled: true,
+            //
             loading: true,
             searchLoading: false,
             // 选中的值
